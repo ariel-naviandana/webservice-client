@@ -24,5 +24,10 @@
 
     <a href="{{ route('login_form') }}" class="btn-detail">Login Here</a>
 </div>
+@if(session('message'))
+    <script>
+        alert("{{ e(session('message')) }}");
+    </script>
+@endif
 </body>
 </html>

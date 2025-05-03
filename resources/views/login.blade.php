@@ -19,13 +19,13 @@
         <input type="submit" value="Login">
     </form>
 
-    @if(request()->has('message'))
-        <div>
-            {{ request()->get('message') }}
-        </div>
-    @endif
-
     <a href="{{ route('register_form') }}" class="btn-detail">Register Here</a>
 </div>
+
+@if(session('message'))
+    <script>
+        alert("{{ e(session('message')) }}");
+    </script>
+@endif
 </body>
 </html>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Session;
 use App\Models\User; // Pastikan kamu punya model User
 
@@ -22,18 +23,24 @@ class AuthController extends Controller
             'password' => 'required|string',
         ]);
 
-        $user = User::where('email', $request->email)->first();
+        $response = Http::post("http://localhost:8000/api/login", [
+            'email' => $request->email,
+            'password' => $request->password,
+        ]);
 
-        if ($user && Hash::check($request->password, $user->password)) {
-            // Simpan user login ke session
-            Session::put('user_id', $user->id);
-            Session::put('user_name', $user->name);
-            Session::put('user_email', $user->email);
+        if($response->status() == 200){
+            $user = $response->json('user');
+
+            Session::put('user_id', $user['id']);
+            Session::put('user_name', $user['name']);
+            Session::put('user_email', $user['email']);
+            Session::put('user_role', $user['role']);
 
             return redirect()->route('dashboard')->with('message', 'Login berhasil!');
+        } else {
+            $error = $response->json('message') ?? 'Login gagal. Silakan coba lagi.';
+            return redirect()->route('login_form')->with('message', $error);
         }
-
-        return redirect()->route('login_form')->with('message', 'Username atau password salah.');
     }
 
     public function showRegisterForm()
@@ -44,18 +51,23 @@ class AuthController extends Controller
     public function registerProcess(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
+            'name' => 'required|string',
+            'email' => 'required|email',
             'password' => 'required|string|min:6',
         ]);
 
-        $user = new User();
-        $user->name = $request->name;
-        $user->email = $request->email;
-        $user->password = Hash::make($request->password);
-        $user->save();
+        $response = Http::post('http://localhost:8000/api/register', [
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => $request->password,
+            'role' => 'admin'
+        ]);
 
-        return redirect()->route('login_form')->with('message', 'Registrasi berhasil, silakan login.');
+        if ($response->status() == 201) {
+            return redirect()->route('login_form')->with('message', 'Registrasi berhasil, silakan login.');
+        } else {
+            return redirect()->back()->with('message', 'Registrasi gagal dilakukan.');
+        }
     }
 
     public function logout()
@@ -63,5 +75,4 @@ class AuthController extends Controller
         Session::flush();
         return redirect()->route('login_form')->with('message', 'Berhasil logout.');
     }
-
 }
