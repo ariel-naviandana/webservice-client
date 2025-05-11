@@ -14,6 +14,8 @@
         @csrf
         <button type="submit" class="btn-logout">Logout</button>
     </form>
+    <br><br>
+    <a href="{{ route('reviews.index') }}" class="btn-detail">Lihat Review Film</a>
 </div>
 </body>
 </html>
