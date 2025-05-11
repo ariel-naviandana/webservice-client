@@ -18,28 +18,39 @@ class AuthController extends Controller
 
     public function loginProcess(Request $request)
     {
+        // Validasi input form
         $request->validate([
             'email' => 'required|email',
             'password' => 'required|string',
         ]);
 
-        $response = Http::post("http://localhost:8000/api/login", [
-            'email' => $request->email,
-            'password' => $request->password,
-        ]);
+        try {
+            // Melakukan request ke API login
+            $response = Http::post("http://localhost:8000/api/login", [
+                'email' => $request->email,
+                'password' => $request->password,
+            ]);
 
-        if($response->status() == 200){
-            $user = $response->json('user');
+            // Mengecek apakah status response adalah 200 OK
+            if ($response->status() == 200) {
+                $user = $response->json('user');
 
-            Session::put('user_id', $user['id']);
-            Session::put('user_name', $user['name']);
-            Session::put('user_email', $user['email']);
-            Session::put('user_role', $user['role']);
+                // Menyimpan data pengguna di session
+                Session::put('user_id', $user['id']);
+                Session::put('user_name', $user['name']);
+                Session::put('user_email', $user['email']);
+                Session::put('user_role', $user['role']);
 
-            return redirect()->route('dashboard')->with('message', 'Login berhasil!');
-        } else {
-            $error = $response->json('message') ?? 'Login gagal. Silakan coba lagi.';
-            return redirect()->route('login_form')->with('message', $error);
+                // Redirect ke halaman dashboard dengan pesan sukses
+                return redirect()->route('dashboard')->with('message', 'Login berhasil!');
+            } else {
+                // Jika login gagal, ambil pesan error dari API dan redirect kembali ke form login
+                $error = $response->json('message') ?? 'Login gagal. Silakan coba lagi.';
+                return redirect()->route('login_form')->with('message', $error);
+            }
+        } catch (\Exception $e) {
+            // Menangani jika terjadi error selama proses request ke API
+            return redirect()->route('login_form')->with('message', 'Terjadi kesalahan. Silakan coba lagi.');
         }
     }
 

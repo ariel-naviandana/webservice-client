@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ReviewController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -18,3 +19,12 @@ Route::get('/dashboard', function () {
 })->name('dashboard');
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+Route::prefix('reviews')->name('reviews.')->group(function () {
+    Route::get('/', [ReviewController::class, 'index'])->name('index');
+    Route::get('/create', [ReviewController::class, 'create'])->name('create');
+    Route::post('/', [ReviewController::class, 'store'])->name('store');
+    Route::get('/{id}/edit', [ReviewController::class, 'edit'])->name('edit');
+    Route::put('/{id}', [ReviewController::class, 'update'])->name('update');
+    Route::delete('/{id}', [ReviewController::class, 'destroy'])->name('destroy');
+});
