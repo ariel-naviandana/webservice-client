@@ -18,34 +18,23 @@
     <form method="POST" action="{{ route('reviews.store') }}">
         @csrf
 
-        <div class="form-group">
-            <label for="film_id">Pilih Film</label>
-            <select name="film_id" id="film_id" required>
-                <option value="">-- Pilih Film --</option>
-                @foreach ($films as $film)
-                    <option value="{{ $film['id'] }}">{{ $film['title'] }}</option>
-                @endforeach
-            </select>
-        </div>
+        <input type="hidden" name="film_id" value="{{ $filmId }}">
 
         <div class="form-group">
             <label for="rating">Rating (1-10)</label>
-            <input type="number" name="rating" id="rating" min="1" max="10" required>
+            <input type="number" name="rating" id="rating" min="1" max="10" required value="{{ old('rating') }}">
         </div>
 
         <div class="form-group">
             <label for="comment">Komentar</label>
-            <textarea name="comment" id="comment" rows="4"></textarea>
+            <textarea name="comment" id="comment" rows="4" required>{{ old('comment') }}</textarea>
         </div>
 
-        <div class="form-checkbox">
-            <input type="checkbox" name="is_critic" id="is_critic" value="1">
-            <label for="is_critic">Reviewer adalah kritikus</label>
-        </div>
+        <input type="hidden" name="film_id" value="{{ $filmId }}">
 
         <div class="form-actions">
             <input type="submit" value="Simpan">
-            <a href="{{ route('reviews.index') }}" class="back">Batal</a>
+            <a href="{{ route('films.show', ['id' => $filmId]) }}" class="back">Batal</a>
         </div>
     </form>
 </div>

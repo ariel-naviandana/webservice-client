@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\FilmController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -14,11 +15,11 @@ Route::post('/login_process', [AuthController::class, 'loginProcess'])->name('lo
 Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register_form');
 Route::post('/register_process', [AuthController::class, 'registerProcess'])->name('register_process');
 
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->name('dashboard');
-
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::prefix('reviews')->name('reviews.')->group(function () {
     Route::get('/', [ReviewController::class, 'index'])->name('index');
@@ -28,3 +29,6 @@ Route::prefix('reviews')->name('reviews.')->group(function () {
     Route::put('/{id}', [ReviewController::class, 'update'])->name('update');
     Route::delete('/{id}', [ReviewController::class, 'destroy'])->name('destroy');
 });
+
+Route::get('/films', [FilmController::class, 'index'])->name('films.index');
+Route::get('/films/{id}', [FilmController::class, 'show'])->name('films.show');

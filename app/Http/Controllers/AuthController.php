@@ -41,8 +41,8 @@ class AuthController extends Controller
                 Session::put('user_email', $user['email']);
                 Session::put('user_role', $user['role']);
 
-                // Redirect ke halaman dashboard dengan pesan sukses
-                return redirect()->route('dashboard')->with('message', 'Login berhasil!');
+                // Redirect ke halaman films.index setelah login berhasil
+                return redirect()->route('films.index'); // Mengarahkan ke halaman films.index
             } else {
                 // Jika login gagal, ambil pesan error dari API dan redirect kembali ke form login
                 $error = $response->json('message') ?? 'Login gagal. Silakan coba lagi.';
@@ -71,7 +71,7 @@ class AuthController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => $request->password,
-            'role' => 'admin'
+            'role' => 'critic'
         ]);
 
         if ($response->status() == 201) {
