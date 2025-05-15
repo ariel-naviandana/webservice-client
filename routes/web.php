@@ -8,10 +8,9 @@ use App\Http\Controllers\WatchlistController;
 use App\Http\Controllers\EditProfileController;
 use App\Http\Controllers\HomeController;
 use App\Models\User;
+use Illuminate\Support\Facades\Http;
 
 Route::get('/', [HomeController::class, 'index']);
-Route::get('/watchlist', [WatchlistController::class, 'index']);
-Route::get('/watchlist/add/{movie}', [WatchlistController::class, 'add'])->name('watchlist.add');
 Route::get('/edit-profile', function () {
     $user = User::find(1);
     return view('editprofile', compact('user'));
@@ -42,3 +41,5 @@ Route::prefix('reviews')->name('reviews.')->group(function () {
 
 Route::get('/films', [FilmController::class, 'index'])->name('films.index');
 Route::get('/films/{id}', [FilmController::class, 'show'])->name('films.show');
+
+Route::get('/welcome', [HomeController::class, 'index'])->name('welcome');
