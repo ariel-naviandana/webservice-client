@@ -19,8 +19,8 @@
 
     <div class="px-16 py-8">
         <div class="grid grid-cols-4 gap-4">
-            @foreach ($movies as $movie)
-                <x-card :posterurl="$movie->poster_url" :title="$movie->title" :genre="$movie->genre" :id="$movie->id" />
+            @foreach ($films as $movie)
+                <x-card :posterurl="$movie['poster_url']" :title="$movie['title']" :genre="$movie['title']" :id="$movie['id']" />
             @endforeach
         </div>
     </div>
