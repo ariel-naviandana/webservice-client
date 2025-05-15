@@ -74,7 +74,7 @@
     @endif
 
     <br><br>
-    <a href="http://localhost:5000/films" class="btn-edit">← Kembali ke Daftar Film</a>
+    <a href="{{ route('welcome') }}" class="btn-edit">← Kembali ke Daftar Film</a>
 </div>
 </body>
 </html>
