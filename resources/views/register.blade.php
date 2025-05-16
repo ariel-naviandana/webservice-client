@@ -5,7 +5,7 @@
     <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
 </head>
 <body>
-<div class="container">
+<div class="containerlogin">
     <h2>Register</h2>
 
     <form action="{{ route('register_process') }}" method="POST">

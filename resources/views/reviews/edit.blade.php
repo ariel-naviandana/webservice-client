@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
 </head>
 <body>
-<div class="container">
+<div class="container2">
     <h2>Edit Review</h2>
 
     @if ($errors->any())
