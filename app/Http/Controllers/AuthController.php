@@ -16,43 +16,43 @@ class AuthController extends Controller
         return view('login');
     }
 
-public function loginProcess(Request $request)
-{
-    // Validasi input form
-    $request->validate([
-        'email' => 'required|email',
-        'password' => 'required|string',
-    ]);
-
-    try {
-        // Melakukan request ke API login
-        $response = Http::post("http://localhost:8000/api/login", [
-            'email' => $request->email,
-            'password' => $request->password,
+    public function loginProcess(Request $request)
+    {
+        // Validasi input form
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|string',
         ]);
 
-        // Mengecek apakah status response adalah 200 OK
-        if ($response->status() == 200) {
-            $user = $response->json('user');
+        try {
+            // Melakukan request ke API login
+            $response = Http::post("http://localhost:8000/api/login", [
+                'email' => $request->email,
+                'password' => $request->password,
+            ]);
 
-            // Menyimpan data pengguna di session
-            Session::put('user_id', $user['id']);
-            Session::put('user_name', $user['name']);
-            Session::put('user_email', $user['email']);
-            Session::put('user_role', $user['role']);
+            // Mengecek apakah status response adalah 200 OK
+            if ($response->status() == 200) {
+                $user = $response->json('user');
 
-            // Redirect ke halaman welcome.blade.php setelah login berhasil
-            return redirect()->route('welcome'); // Ganti films.index menjadi welcome
-        } else {
-            // Jika login gagal, ambil pesan error dari API dan redirect kembali ke form login
-            $error = $response->json('message') ?? 'Login gagal. Silakan coba lagi.';
-            return redirect()->route('login_form')->with('message', $error);
+                // Menyimpan data pengguna di session
+                Session::put('user_id', $user['id']);
+                Session::put('user_name', $user['name']);
+                Session::put('user_email', $user['email']);
+                Session::put('user_role', $user['role']);
+
+                // Redirect ke halaman welcome.blade.php setelah login berhasil
+                return redirect()->route('welcome'); // Ganti films.index menjadi welcome
+            } else {
+                // Jika login gagal, ambil pesan error dari API dan redirect kembali ke form login
+                $error = $response->json('message') ?? 'Login gagal. Silakan coba lagi.';
+                return redirect()->route('login_form')->with('message', $error);
+            }
+        } catch (\Exception $e) {
+            // Menangani jika terjadi error selama proses request ke API
+            return redirect()->route('login_form')->with('message', 'Terjadi kesalahan. Silakan coba lagi.');
         }
-    } catch (\Exception $e) {
-        // Menangani jika terjadi error selama proses request ke API
-        return redirect()->route('login_form')->with('message', 'Terjadi kesalahan. Silakan coba lagi.');
     }
-}
 
 
     public function showRegisterForm()
