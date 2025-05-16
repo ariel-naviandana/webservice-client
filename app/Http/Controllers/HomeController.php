@@ -7,56 +7,64 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 class HomeController extends Controller
 {
-    protected $filmsApiUrl = 'http://localhost:8000/api/films'; // URL API film
-    protected $reviewsApiUrl = 'http://localhost:8000/api/reviews'; // URL API review film
+    protected $filmsApiUrl = 'http://localhost:8000/api/films';
 
-public function index()
-{
-    // Ambil data film dari API
-    $response = Http::get($this->filmsApiUrl);
+    public function index()
+    {
+        // Ambil data film dari API lokal
+        $response = Http::get($this->filmsApiUrl);
 
-    if (!$response->successful()) {
-        return redirect()->back()->with('error', 'Gagal mengambil data film');
-    }
+        // Jika gagal, redirect kembali dengan pesan error
+        if (!$response->successful()) {
+            return redirect()->back()->with('error', 'Gagal mengambil data film');
+        }
 
-    $films = $response->json();
-
-    // Filter berdasarkan query string (opsional)
-    $filteredFilms = collect($films);
-
-    if (request('genre')) {
-        $filteredFilms = $filteredFilms->filter(function ($film) {
-            return isset($film['genre']) && $film['genre'] === request('genre');
+        // Ambil isi JSON dan ubah menjadi collection
+        $films = collect($response->json())->map(function ($film) {
+            // Cek dan format poster_url agar menjadi URL lengkap
+            $film['poster_url'] = !empty($film['poster_url'])
+                ? (Str::startsWith($film['poster_url'], 'http')
+                    ? $film['poster_url']
+                    : 'https://image.tmdb.org/t/p/w500' . $film['poster_url'])
+                : 'https://via.placeholder.com/300x450?text=No+Image';
+            return $film;
         });
+
+        // Filter berdasarkan genre jika ada
+        if (request('genre')) {
+            $films = $films->filter(function ($film) {
+                return isset($film['genre']) && $film['genre'] === request('genre');
+            });
+        }
+
+        // Filter berdasarkan cast jika ada
+        if (request('cast')) {
+            $films = $films->filter(function ($film) {
+                return isset($film['cast']) && in_array(request('cast'), $film['cast']);
+            });
+        }
+
+        // Ambil semua genre unik untuk ditampilkan di filter
+        $genres = $films->pluck('genre')->unique()->filter()->values()->all();
+
+        // Ambil semua cast unik
+        $casts = $films
+            ->pluck('cast')
+            ->flatten()
+            ->unique()
+            ->filter()
+            ->values()
+            ->all();
+
+        // Kirim ke view
+        return view('welcome', [
+            'films' => $films,
+            'genres' => $genres,
+            'casts' => $casts,
+        ]);
     }
-
-    if (request('cast')) {
-        $filteredFilms = $filteredFilms->filter(function ($film) {
-            return isset($film['cast']) && in_array(request('cast'), $film['cast']);
-        });
-    }
-
-    // Ambil semua genre unik
-    $genres = collect($films)->pluck('genre')->unique()->filter()->values()->all();
-
-    // Ambil semua cast unik
-    $casts = collect($films)
-        ->pluck('cast')
-        ->flatten()
-        ->unique()
-        ->filter()
-        ->values()
-        ->all();
-
-    return view('welcome', [
-        'films' => $filteredFilms,
-        'genres' => $genres,
-        'casts' => $casts,
-    ]);
-}
-
-
 }

@@ -31,12 +31,12 @@
                         : request()->fullUrlWithQuery(['genre' => $genreItem]);
                 @endphp
                 <a href="{{ $url }}"
-                    class="px-4 py-2 rounded-full border {{ $isActive ? 'bg-blue-500 text-white' : 'bg-white text-gray-700' }}">
+                   class="px-4 py-2 rounded-full border {{ $isActive ? 'bg-blue-500 text-white' : 'bg-white text-gray-700' }}">
                     {{ $genreItem }}
                 </a>
             @endforeach
             <a href="{{ route('welcome') }}"
-                class="px-4 py-2 rounded-full border bg-white text-gray-700">Reset</a>
+               class="px-4 py-2 rounded-full border bg-white text-gray-700">Reset</a>
         </div>
 
         <h2 class="text-2xl font-bold mb-2">Filter Cast</h2>
@@ -49,7 +49,7 @@
                         : request()->fullUrlWithQuery(['cast' => $castItem]);
                 @endphp
                 <a href="{{ $url }}"
-                    class="px-4 py-2 rounded-full border {{ $isActive ? 'bg-green-500 text-white' : 'bg-white text-gray-700' }}">
+                   class="px-4 py-2 rounded-full border {{ $isActive ? 'bg-green-500 text-white' : 'bg-white text-gray-700' }}">
                     {{ $castItem }}
                 </a>
             @endforeach
@@ -59,14 +59,10 @@
     {{-- Film List --}}
     <div class="px-16 py-8">
         <div class="grid grid-cols-4 gap-4">
-            @php use Illuminate\Support\Str; @endphp
-
             @foreach ($films as $movie)
                 @php
                     $poster = !empty($movie['poster_url'])
-                        ? (Str::startsWith($movie['poster_url'], 'http')
-                            ? $movie['poster_url']
-                            : 'https://your-base-url.com/images/' . $movie['poster_url'])
+                        ? $movie['poster_url']
                         : 'https://via.placeholder.com/300x450?text=No+Image';
                 @endphp
 

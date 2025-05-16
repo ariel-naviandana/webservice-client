@@ -1,536 +1,187 @@
-/* ------------------------------ Light Mode ------------------------------ */
+/* ------------------------------ Light Mode IMDb-inspired ------------------------------ */
 
 body {
     font-family: 'Helvetica Neue', Arial, sans-serif;
-    background-color: #cde3fc;
+    background-color: #f5f5f5; /* putih ke abu2 terang */
     margin: 0;
     padding: 20px;
     overflow-y: auto;
-}
-
-body::-webkit-scrollbar {
-    width: 0;
-    height: 0;
+    color: #222; /* warna teks utama */
 }
 
 .container {
-    background-color: #ffffff;
-    padding: 30px;
+    background-color: #fff;
+    padding: 30px 40px;
     margin: auto;
-    width: 80%;
-    max-width: 800px;
-    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.5);
-    border-radius: 16px;
-}
-
-h2 {
-    text-align: center;
-    color: #000000;
-    font-size: 28px;
-}
-
-h4 {
-    text-align: right;
-    margin-top: 0;
-    color: #878787;
-}
-
-a {
-    text-decoration: none;
-}
-
-
-
-/* ---------- Form ---------- */
-
-form {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    align-items: center;
-}
-
-input[type="text"], input[type="password"] {
-    padding: 4px;
-    border: 1px solid #dddddd;
-    border-radius: 4px;
-    width: 100%;
-    max-width: 300px;
-    background-color: #ffffff;
-    color: #000000;
-}
-
-input[type="text"], input[type="email"], input[type="date"], input[type="file"] {
-    padding: 4px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    width: 100%;
-    max-width: 300px;
-}
-
-input[type="submit"] {
-    background-color: #007bff;
-    color: white;
-    padding: 5px 15px;
-    border: none;
-    border-radius: 5px;
-    width: 310px;
-    transition: background-color 0.3s ease;
-}
-
-input[type="submit"]:hover {
-    background-color: #005fc4;
-}
-
-
-
-/* ---------- Frame Foto ---------- */
-
-.gallery {
-    display: block;
-}
-
-.gallery-item {
-    border: 1px solid #ddd;
-    padding: 16px;
-    margin-bottom: 16px;
-    border-radius: 16px;
-    background-color: #f9f9f9;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.gallery-item:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-}
-
-.gallery-image {
-    border-radius: 8px;
-    width: 100%;
-    height: auto;
-    max-width: 250px;
-    max-height: 250px;
-    object-fit: cover;
-}
-
-.gallery-info {
-    margin-top: 10px;
-    font-size: 14px;
-    color: #333333;
-}
-
-.gallery-item .btn-group {
-    display: flex;
-    gap: 8px;
-    margin-top: 10px;
-    padding: 0 0;
-    width: 100%;
-}
-
-.img-detail {
-    width : 100%;
-    max-width : 800px;
+    width: 85%;
+    max-width: 900px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     border-radius: 8px;
 }
 
-
-
-/* ---------- Button ---------- */
-
-.btn-tambah {
-    background-color: #e0ffe0;
-    color: #28a745;
-    border: none;
-    border-radius: 8px;
-    padding: 8px 12px;
-    font-size: 14px;
-    display: inline-block;
+h1 {
+    font-weight: 700;
+    font-size: 36px;
     margin-bottom: 10px;
-    text-align: center;
-    transition: background-color 0.3s ease;
+    color: #111;
+    border-bottom: 3px solid #f5c518; /* warna kuning IMDb */
+    padding-bottom: 8px;
 }
 
-.btn-tambah:hover {
-    background-color: #ccffcc;
-}
-
-.btn-logout {
-    background-color: #ffe0e0;
-    color: #d9534f;
-    text-decoration: none;
-    border: none;
-    border-radius: 8px;
-    padding: 8px 12px;
-    font-size: 14px;
-    transition: background-color 0.3s ease;
-}
-
-.btn-logout:hover {
-    background-color: #ffcccc;
-}
-
-.btn-detail, .btn-edit, .btn-delete {
-    display: inline-block;
-    padding: 8px 12px;
-    text-decoration: none;
-    border-radius: 8px;
-    font-size: 14px;
-    cursor: pointer;
-    margin-top: 4px;
-    transition: background-color 0.3s ease;
-}
-
-a.back {
-    display: inline-block;
-    padding: 8px 12px;
-    text-decoration: none;
-    border-radius: 8px;
-    font-size: 14px;
-    cursor: pointer;
-    margin-top: 4px;
-    transition: background-color 0.3s ease;
-}
-
-.btn-detail, a.back {
-    background-color: #e0eaff;
-    color: #007bff;
-}
-
-.btn-detail:hover, a.back:hover {
-    background-color: #c8daff;
-}
-
-/*.btn-edit {*/
-/*    background-color: #e0ffe0;*/
-/*    color: #28a745;*/
-/*}*/
-
-/*.btn-edit:hover {*/
-/*    background-color: #ccffcc;*/
-/*}*/
-
-.btn-edit {
-    background-color: #e0eaff;
-    color: #007bff;
-}
-
-.btn-edit:hover {
-    background-color: #c8daff;
-}
-
-.btn-delete {
-    background-color: #ffe0e0;
-    color: #dc3545;
-    border: 0;
-}
-
-.btn-delete:hover {
-    background-color: #ffcccc;
-}
-
-
-
-.form-group {
-    margin-bottom: 16px;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 6px;
-    font-weight: bold;
-}
-
-.form-group select {
-    width: 320px;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 14px;
-}
-
-.form-group input[type="number"],
-.form-group textarea {
-    width: 300px;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 14px;
-}
-
-.form-checkbox {
-    display: flex;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.form-checkbox input {
-    margin-right: 8px;
-}
-
-.form-actions input[type="submit"] {
-    padding: 8px;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-}
-
-.form-actions {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    margin-top: 6px;
-}
-
-.form-actions .back {
-    text-align: center;
-    padding: 8px 16px;
-    background-color: #e0eaff;
-    color: #007bff;
-    border-radius: 8px;
-    font-size: 14px;
-    cursor: pointer;
-    text-decoration: none;
-}
-
-.form-actions .back:hover {
-    background-color: #c8daff;
-}
-
-
-
-/* ------------------------------ Dark Mode ------------------------------ */
-
-/* body {
-    font-family: 'Helvetica Neue', Arial, sans-serif;
-    background-color: #181818;
-    margin: 0;
-    padding: 20px;
-    overflow-y: auto;
-}
-
-body::-webkit-scrollbar {
-    width: 0;
-    height: 0;
-}
-
-.container {
-    background-color: #020101;
-    padding: 30px;
-    margin: auto;
-    width: 80%;
-    max-width: 800px;
-    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.5);
-    border-radius: 16px;
-}
-
-h2 {
-    text-align: center;
-    color: #ffffff;
-    font-size: 28px;
-}
-
-h4 {
-    text-align: right;
-    margin-top: 0px;
-    color: #878787;
-}
-
-a {
-    text-decoration: none;
-}
-
-p {
-    color: #ffffff;
-}
-
-label {
-    color: #ffffff;
-}
-
-form {
-    color: #000000;
-} */
-
-
-
-/* ---------- Form ---------- */
-
-/* form {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    align-items: center;
-}
-
-input[type="text"], input[type="password"] {
-    padding: 4px;
-    border: 1px solid #dddddd;
-    border-radius: 4px;
-    width: 100%;
-    max-width: 300px;
-    background-color: #000000;
-    color: #ffffff;
-}
-
-input[type="text"], input[type="email"], input[type="date"], input[type="file"] {
-    padding: 4px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    width: 100%;
-    max-width: 300px;
-}
-
-input[type="submit"] {
-    background-color: #007bff;
-    color: white;
-    padding: 5px 15px;
-    border: none;
-    border-radius: 5px;
-    width: 310px;
-    transition: background-color 0.3s ease;
-}
-
-input[type="submit"]:hover {
-    background-color: #005fc4;
-} */
-
-
-
-/* ---------- Frame Foto ---------- */
-
-/* .gallery {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;
+.film-details {
+    display: block; /* tidak pakai flex */
     margin-top: 20px;
 }
 
-.gallery-item {
-    background-color: #181818;
-    border-radius: 12px;
-    padding: 10px;
-    text-align: center;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.gallery-item:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-}
-
-.gallery-image {
-    border-radius: 8px;
+.film-details img {
+    display: block;
+    margin: 0 auto 20px auto;
+    border-radius: 6px;
     width: 100%;
-    height: auto;
-    max-width: 250px;
-    max-height: 250px;
+    max-width: 300px;
     object-fit: cover;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
 
-.gallery-info {
+.film-info {
     margin-top: 10px;
-    font-size: 14px;
-    color: #ffffff;
+    font-size: 16px;
+    line-height: 1.6;
+    color: #444;
 }
 
-.gallery-item .btn-group {
-    display: flex;
-    justify-content: space-between;
-    gap: 2px;
-    margin-top: 10px;
-    padding: 0 0px;
-    width: 100%;
+.film-info p {
+    margin: 10px 0;
 }
 
-.img-detail {
-    width : 100%;
-    max-width : 800;
-    border-radius: 8px;
-} */
-
-
-
-/* ---------- Button ---------- */
-
-/* .btn-tambah {
-    background-color: #28a745;
-    color: #e0ffe0;
-    border: none;
-    border-radius: 8px;
-    padding: 8px 12px;
-    font-size: 14px;
+.film-info p strong {
     display: inline-block;
-    margin-bottom: 10px;
-    text-align: center;
-    transition: background-color 0.3s ease;
+    width: 120px;
+    color: #222;
+    font-weight: 600;
 }
 
-.btn-tambah:hover {
-    background-color: #28a746b6;
+
+/* Genre & Pemeran */
+.film-info p.genre, .film-info p.cast {
+    margin-top: 12px;
+    font-size: 15px;
+    color: #666;
 }
 
-.btn-logout {
-    background-color: #d9534f;
-    color: #ffe0e0;
-    text-decoration: none;
-    border-radius: 8px;
-    padding: 8px 12px;
-    font-size: 14px;
-    transition: background-color 0.3s ease;
+.film-info p.genre strong,
+.film-info p.cast strong {
+    color: #222;
 }
 
-.btn-logout:hover {
-    background-color: #d9544fb7;
+/* Rating and Reviews */
+.rating-summary {
+    margin: 20px 0 10px 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #f5c518;
 }
 
-.btn-detail, .btn-edit, .btn-delete {
+.review {
+    background-color: #fafafa;
+    border-left: 5px solid #f5c518;
+    padding: 12px 15px;
+    margin-bottom: 12px;
+    border-radius: 4px;
+}
+
+.review p {
+    margin: 6px 0;
+    color: #333;
+    font-size: 15px;
+}
+
+/* Buttons */
+.btn-edit, .btn-delete, .btn-tambah, .btn-detail, a.back {
     display: inline-block;
-    padding: 8px 12px;
-    text-decoration: none;
-    border-radius: 8px;
+    padding: 10px 16px;
     font-size: 14px;
+    border-radius: 6px;
+    font-weight: 600;
     cursor: pointer;
-    margin-top: 4px;
-    transition: background-color 0.3s ease;
-}
-
-a.back {
-    display: inline-block;
-    padding: 8px 12px;
     text-decoration: none;
-    border-radius: 8px;
-    font-size: 14px;
-    cursor: pointer;
-    margin-top: 4px;
-    transition: background-color 0.3s ease;
-}
-
-.btn-detail, a.back {
-    background-color: #007bff;
-    color: #e0eaff;
-}
-
-.btn-detail:hover, a.back:hover {
-    background-color: #007bffb8;
+    transition: background-color 0.25s ease;
 }
 
 .btn-edit {
-    background-color: #28a745;
-    color: #e0ffe0;
+    background-color: #f5c518;
+    color: #111;
+    border: none;
 }
 
 .btn-edit:hover {
-    background-color: #28a746bc;
+    background-color: #d4af37;
 }
 
 .btn-delete {
-    background-color: #dc3545;
-    color: #ffe0e0;
+    background-color: #e03e2f;
+    color: white;
+    border: none;
 }
 
 .btn-delete:hover {
-    background-color: #dc3546af;
-} */
+    background-color: #b53122;
+}
+
+.btn-detail, a.back {
+    background-color: #0077cc;
+    color: white;
+    border: none;
+}
+
+.btn-detail:hover, a.back:hover {
+    background-color: #005fa3;
+}
+
+/* Form */
+form {
+    margin-top: 20px;
+}
+
+input[type="text"], input[type="number"], textarea, select {
+    width: 100%;
+    max-width: 400px;
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 15px;
+    margin-bottom: 12px;
+    box-sizing: border-box;
+}
+
+input[type="submit"] {
+    background-color: #f5c518;
+    color: #111;
+    border: none;
+    font-weight: 700;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background-color 0.3s ease;
+}
+
+input[type="submit"]:hover {
+    background-color: #d4af37;
+}
+
+/* Responsive */
+@media (max-width: 720px) {
+    .film-details {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .film-details img {
+        width: 100%;
+        max-width: 300px;
+    }
+
+    .film-info {
+        width: 100%;
+    }
+}
