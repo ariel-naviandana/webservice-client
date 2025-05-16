@@ -1,12 +1,12 @@
 <nav class="px-16 flex justify-between items-center py-4 bg-yellow-300 shadow-md fixed w-full top-0">
     <a href="{{ route('welcome') }}" class="text-2xl font-bold">
-        Film
+        FilmHub
     </a>
 
     <div class="relative">
         @if (session('user_id'))
             {{-- Jika user sudah login, tampilkan tombol dropdown --}}
-            <button id="accountBtn" class="bg-green-400 px-4 py-2 cursor-pointer hover:bg-green-500 text-black">
+            <button id="accountBtn" class="bg-yellow-400 px-4 py-2 cursor-pointer hover:bg-yellow-500 text-black rounded">
                 {{ session('user_name') ?? 'Akun' }}
             </button>
 

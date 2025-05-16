@@ -5,7 +5,7 @@
     <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
 </head>
 <body class="login-page">
-<div class="container login-container">
+<div class="containerlogin">
     <h1 style="color:#e4b70d">Film</h1>
     <h2>Login</h2>
 
