@@ -42,7 +42,7 @@ public function loginProcess(Request $request)
             Session::put('user_role', $user['role']);
 
             // Redirect ke halaman welcome.blade.php setelah login berhasil
-            return redirect()->route('welcome'); // Ganti films.index menjadi welcome
+            return redirect()->route('films.index'); // Ganti films.index menjadi welcome
         } else {
             // Jika login gagal, ambil pesan error dari API dan redirect kembali ke form login
             $error = $response->json('message') ?? 'Login gagal. Silakan coba lagi.';
