@@ -11,12 +11,14 @@ use Illuminate\Support\Str;
 
 class HomeController extends Controller
 {
-    protected $filmsApiUrl = 'http://localhost:8000/api/films';
+    protected $baseUrl = 'http://localhost:8000/api';
 
     public function index()
     {
         // Ambil data film dari API lokal
-        $response = Http::get($this->filmsApiUrl);
+        $response = Http::get(url: "{$this->baseUrl}/films");
+        $responseCasts = Http::get(url: "{$this->baseUrl}/casts");
+        $responseGenres = Http::get(url: "{$this->baseUrl}/genres");
 
         // Jika gagal, redirect kembali dengan pesan error
         if (!$response->successful()) {
@@ -34,31 +36,39 @@ class HomeController extends Controller
             return $film;
         });
 
+        if ($responseCasts->successful()) {
+            $casts = $responseCasts->json();
+        }
+
+        if ($responseGenres->successful()) {
+            $genres = $responseGenres->json();
+        }
+
         // Filter berdasarkan genre jika ada
-        if (request('genre')) {
-            $films = $films->filter(function ($film) {
-                return isset($film['genre']) && $film['genre'] === request('genre');
-            });
-        }
+        // if (request('genre')) {
+        //     $films = $films->filter(function ($film) {
+        //         return isset($film['genre']) && $film['genre'] === request('genre');
+        //     });
+        // }
 
-        // Filter berdasarkan cast jika ada
-        if (request('cast')) {
-            $films = $films->filter(function ($film) {
-                return isset($film['cast']) && in_array(request('cast'), $film['cast']);
-            });
-        }
+        // // Filter berdasarkan cast jika ada
+        // if (request('cast')) {
+        //     $films = $films->filter(function ($film) {
+        //         return isset($film['cast']) && in_array(request('cast'), $film['cast']);
+        //     });
+        // }
 
-        // Ambil semua genre unik untuk ditampilkan di filter
-        $genres = $films->pluck('genre')->unique()->filter()->values()->all();
+        // // Ambil semua genre unik untuk ditampilkan di filter
+        // $genres = $films->pluck('genre')->unique()->filter()->values()->all();
 
-        // Ambil semua cast unik
-        $casts = $films
-            ->pluck('cast')
-            ->flatten()
-            ->unique()
-            ->filter()
-            ->values()
-            ->all();
+        // // Ambil semua cast unik
+        // $casts = $films
+        //     ->pluck('cast')
+        //     ->flatten()
+        //     ->unique()
+        //     ->filter()
+        //     ->values()
+        //     ->all();
 
         // Kirim ke view
         return view('welcome', [
