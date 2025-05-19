@@ -1,6 +1,6 @@
 <nav class="px-16 flex justify-between items-center py-4 bg-yellow-300 shadow-md fixed w-full top-0">
     <a href="{{ route('welcome') }}" class="text-2xl font-bold">
-        FilmHub
+        Film
     </a>
 
     <div class="relative">

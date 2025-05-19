@@ -10,6 +10,9 @@ use App\Http\Controllers\HomeController;
 use App\Models\User;
 use Illuminate\Support\Facades\Http;
 
+Route::view('/editprofile', 'editprofile')->name('editprofile');
+Route::post('/edit', [EditProfileController::class, 'edit']);
+
 Route::get('/', [HomeController::class, 'index']);
 Route::get('/edit-profile', function () {
     $user = User::find(1);
