@@ -20,42 +20,42 @@
     </div>
 
     {{-- Filter Section --}}
-    <div class="px-16">
-        <h2 class="text-2xl font-bold mb-2">Filter Genre</h2>
-        <div class="flex gap-2 flex-wrap mb-6">
-            @foreach ($genres as $genreItem)
-    @php
-        $genreName = $genreItem['name'];
-        $isActive = request('genre') == $genreName;
-        $url = $isActive
-            ? request()->fullUrlWithQuery(['genre' => null])
-            : request()->fullUrlWithQuery(['genre' => $genreName]);
-    @endphp
-    <a href="{{ $url }}"
-       class="px-4 py-2 rounded-full border {{ $isActive ? 'bg-blue-500 text-white' : 'bg-white text-gray-700' }}">
-        {{ $genreName }}
-    </a>
-@endforeach
+                <div class="px-16">
+                    <h2 class="text-2xl font-bold mb-2">Filter Genre</h2>
+                    <div class="flex gap-2 flex-wrap mb-6">
+                        @foreach ($genres as $genreItem)
+                @php
+                    $genreName = $genreItem['name'];
+                    $isActive = request('genre') == $genreName;
+                    $url = $isActive
+                        ? request()->fullUrlWithQuery(['genre' => null])
+                        : request()->fullUrlWithQuery(['genre' => $genreName]);
+                @endphp
+                <a href="{{ $url }}"
+                class="px-4 py-2 rounded-full border {{ $isActive ? 'bg-blue-500 text-white' : 'bg-white text-gray-700' }}">
+                    {{ $genreName }}
+                </a>
+            @endforeach
 
-            <a href="{{ route('welcome') }}"
-               class="px-4 py-2 rounded-full border bg-white text-gray-700">Reset</a>
-        </div>
+                        <a href="{{ route('welcome') }}"
+                        class="px-4 py-2 rounded-full border bg-white text-gray-700">Reset</a>
+                    </div>
 
-        <h2 class="text-2xl font-bold mb-2">Filter Cast</h2>
-        <div class="flex gap-2 flex-wrap mb-8">
-            @foreach ($casts as $castItem)
-    @php
-        $castName = $castItem['name'];
-        $isActive = request('cast') == $castName;
-        $url = $isActive
-            ? request()->fullUrlWithQuery(['cast' => null])
-            : request()->fullUrlWithQuery(['cast' => $castName]);
-    @endphp
-    <a href="{{ $url }}"
-       class="px-4 py-2 rounded-full border {{ $isActive ? 'bg-green-500 text-white' : 'bg-white text-gray-700' }}">
-        {{ $castName }}
-    </a>
-@endforeach
+                    <h2 class="text-2xl font-bold mb-2">Filter Cast</h2>
+                    <div class="flex gap-2 flex-wrap mb-8">
+                        @foreach ($casts as $castItem)
+                @php
+                    $castName = $castItem['name'];
+                    $isActive = request('cast') == $castName;
+                    $url = $isActive
+                        ? request()->fullUrlWithQuery(['cast' => null])
+                        : request()->fullUrlWithQuery(['cast' => $castName]);
+                @endphp
+                <a href="{{ $url }}"
+                class="px-4 py-2 rounded-full border {{ $isActive ? 'bg-green-500 text-white' : 'bg-white text-gray-700' }}">
+                    {{ $castName }}
+                </a>
+            @endforeach
 
         </div>
     </div>
