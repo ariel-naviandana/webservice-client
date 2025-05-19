@@ -38,7 +38,7 @@ Route::prefix('reviews')->name('reviews.')->group(function () {
     Route::delete('/{id}', [ReviewController::class, 'destroy'])->name('destroy');
 });
 
-Route::get('/', [FilmController::class, 'index'])->name('films.index');
+Route::get('/films', [FilmController::class, 'index'])->name('films.index');
 Route::get('/films/{id}', [FilmController::class, 'show'])->name('films.show');
 
-Route::get('/welcome', [HomeController::class, 'index'])->name('welcome');
+Route::get('/', [HomeController::class, 'index'])->name('welcome');
