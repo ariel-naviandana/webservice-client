@@ -14,7 +14,7 @@
 
     <div class="px-16 py-8 mt-16">
         <h1 class="text-4xl font-bold">
-            Selamat datang {{ session('user_name') ?? 'Pengunjung' }} di Film
+            Selamat datang {{ session('user_name') ?? 'Pengunjung' }} di FilmKu
         </h1>
         <p class="mt-4 text-lg">Temukan film favoritmu di sini!</p>
     </div>
