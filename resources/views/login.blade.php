@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Login Film</title>
+    <title>Login FilmKu</title>
     <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
 </head>
 <body class="login-page">

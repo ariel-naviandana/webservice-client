@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\Http;
 Route::view('/editprofile', 'editprofile')->name('editprofile');
 Route::post('/edit', [EditProfileController::class, 'edit']);
 
-Route::get('/', [HomeController::class, 'index']);
 Route::get('/edit-profile', function () {
     $user = User::find(1);
     return view('editprofile', compact('user'));
@@ -45,4 +44,4 @@ Route::prefix('reviews')->name('reviews.')->group(function () {
 Route::get('/films', [FilmController::class, 'index'])->name('films.index');
 Route::get('/films/{id}', [FilmController::class, 'show'])->name('films.show');
 
-Route::get('/welcome', [HomeController::class, 'index'])->name('welcome');
+Route::get('/', [HomeController::class, 'index'])->name('welcome');
