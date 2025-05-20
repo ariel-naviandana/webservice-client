@@ -26,14 +26,7 @@ class HomeController extends Controller
             return redirect()->back()->with('error', 'Gagal mengambil data film');
         }
 
-        $films = collect($response->json())->map(function ($film) {
-            $film['poster_url'] = !empty($film['poster_url'])
-                ? (Str::startsWith($film['poster_url'], 'http')
-                    ? $film['poster_url']
-                    : 'https://image.tmdb.org/t/p/w500' . $film['poster_url'])
-                : 'https://via.placeholder.com/300x450?text=No+Image';
-            return $film;
-        });
+        $films = $response->json();
 
         // FILTER by genre
         if ($genreFilter) {

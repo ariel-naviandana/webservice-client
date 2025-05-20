@@ -10,7 +10,7 @@
     <h1>{{ $film['title'] }}</h1>
 
     <div class="film-details">
-        <img src="{{ $film['poster_url'] }}" alt="Poster {{ $film['title'] }}" style="width:200px;float:right;margin-left:20px;">
+        <img src="{{ $film['poster_url'] ?? 'https://i.pinimg.com/236x/56/2e/be/562ebed9cd49b9a09baa35eddfe86b00.jpg' }}" alt="Poster {{ $film['title'] }}" style="width:200px;float:right;margin-left:20px;">
 
         <p><strong>Sinopsis:</strong> {{ $film['synopsis'] }}</p>
         <p><strong>Tahun Rilis:</strong> {{ $film['release_year'] }}</p>

@@ -50,7 +50,7 @@
         <!-- FOTO PROFIL -->
         <div class="flex justify-center">
             <label for="photo">
-                <img id="preview" src="{{ session('user_photo') ? session('user_photo') : 'https://i.pinimg.com/236x/56/2e/be/562ebed9cd49b9a09baa35eddfe86b00.jpg' }}"
+                <img id="preview" src="{{ session('user_photo') ?? 'https://i.pinimg.com/236x/56/2e/be/562ebed9cd49b9a09baa35eddfe86b00.jpg' }}"
                      alt="Foto Profil" class="profile-pic mx-auto">
             </label>
             <input type="file" name="photo" id="photo" accept="image/*" onchange="previewImage(event)">

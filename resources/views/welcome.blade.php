@@ -60,9 +60,7 @@
         <div class="grid grid-cols-4 gap-4">
             @foreach ($films as $movie)
                 @php
-                    $poster = !empty($movie['poster_url'])
-                        ? $movie['poster_url']
-                        : 'https://via.placeholder.com/300x450?text=No+Image';
+                    $poster = $movie['poster_url'] ?? 'https://i.pinimg.com/236x/56/2e/be/562ebed9cd49b9a09baa35eddfe86b00.jpg';
                 @endphp
 
                 <a href="{{ route('films.show', $movie['id']) }}" class="block hover:shadow-lg transition">
