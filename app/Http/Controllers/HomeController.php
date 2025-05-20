@@ -13,21 +13,20 @@ class HomeController extends Controller
 {
     protected $baseUrl = 'http://localhost:8000/api';
 
-    public function index()
+    public function index(Request $request)
     {
-        // Ambil data film dari API lokal
-        $response = Http::get(url: "{$this->baseUrl}/films");
-        $responseCasts = Http::get(url: "{$this->baseUrl}/casts");
-        $responseGenres = Http::get(url: "{$this->baseUrl}/genres");
+        $genreFilter = $request->input('genre');
+        $castFilter = $request->input('cast');
 
-        // Jika gagal, redirect kembali dengan pesan error
+        $response = Http::get("{$this->baseUrl}/films");
+        $responseCasts = Http::get("{$this->baseUrl}/casts");
+        $responseGenres = Http::get("{$this->baseUrl}/genres");
+
         if (!$response->successful()) {
             return redirect()->back()->with('error', 'Gagal mengambil data film');
         }
 
-        // Ambil isi JSON dan ubah menjadi collection
         $films = collect($response->json())->map(function ($film) {
-            // Cek dan format poster_url agar menjadi URL lengkap
             $film['poster_url'] = !empty($film['poster_url'])
                 ? (Str::startsWith($film['poster_url'], 'http')
                     ? $film['poster_url']
@@ -36,45 +35,24 @@ class HomeController extends Controller
             return $film;
         });
 
-        if ($responseCasts->successful()) {
-            $casts = $responseCasts->json();
+        // FILTER by genre
+        if ($genreFilter) {
+            $films = $films->filter(function ($film) use ($genreFilter) {
+                return collect($film['genres'])->pluck('name')->contains($genreFilter);
+            });
         }
 
-        if ($responseGenres->successful()) {
-            $genres = $responseGenres->json();
+        // FILTER by cast
+        if ($castFilter) {
+            $films = $films->filter(function ($film) use ($castFilter) {
+                return collect($film['characters'])->pluck('name')->contains($castFilter);
+            });
         }
 
-        // Filter berdasarkan genre jika ada
-        // if (request('genre')) {
-        //     $films = $films->filter(function ($film) {
-        //         return isset($film['genre']) && $film['genre'] === request('genre');
-        //     });
-        // }
-
-        // // Filter berdasarkan cast jika ada
-        // if (request('cast')) {
-        //     $films = $films->filter(function ($film) {
-        //         return isset($film['cast']) && in_array(request('cast'), $film['cast']);
-        //     });
-        // }
-
-        // // Ambil semua genre unik untuk ditampilkan di filter
-        // $genres = $films->pluck('genre')->unique()->filter()->values()->all();
-
-        // // Ambil semua cast unik
-        // $casts = $films
-        //     ->pluck('cast')
-        //     ->flatten()
-        //     ->unique()
-        //     ->filter()
-        //     ->values()
-        //     ->all();
-
-        // Kirim ke view
         return view('welcome', [
             'films' => $films,
-            'genres' => $genres,
-            'casts' => $casts,
+            'genres' => $responseGenres->successful() ? $responseGenres->json() : [],
+            'casts' => $responseCasts->successful() ? $responseCasts->json() : [],
         ]);
     }
 }

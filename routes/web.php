@@ -4,12 +4,16 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\FilmController;
+use App\Http\Controllers\WatchlistController;
 use App\Http\Controllers\EditProfileController;
 use App\Http\Controllers\HomeController;
 use App\Models\User;
 use Illuminate\Support\Facades\Http;
 
-//Route::get('/', [HomeController::class, 'index']);
+Route::view('/editprofile', 'editprofile')->name('editprofile');
+Route::post('/edit', [EditProfileController::class, 'edit']);
+
+Route::get('/', [HomeController::class, 'index']);
 Route::get('/edit-profile', function () {
     $user = User::find(1);
     return view('editprofile', compact('user'));
@@ -41,4 +45,4 @@ Route::prefix('reviews')->name('reviews.')->group(function () {
 Route::get('/films', [FilmController::class, 'index'])->name('films.index');
 Route::get('/films/{id}', [FilmController::class, 'show'])->name('films.show');
 
-Route::get('/', [HomeController::class, 'index'])->name('welcome');
+Route::get('/welcome', [HomeController::class, 'index'])->name('welcome');

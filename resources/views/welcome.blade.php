@@ -19,46 +19,41 @@
         <p class="mt-4 text-lg">Temukan film favoritmu di sini!</p>
     </div>
 
-    {{-- Filter Section --}}
-                <div class="px-16">
-                    <h2 class="text-2xl font-bold mb-2">Filter Genre</h2>
-                    <div class="flex gap-2 flex-wrap mb-6">
+        {{-- Filter Section Dropdown --}}
+    <div class="px-16 mb-8">
+        <form method="GET" action="{{ route('welcome') }}" class="space-y-4">
+            <div class="flex space-x-6">
+                <div class="flex-[0.2]">
+                    <label for="genre" class="block text-xl font-semibold mb-1">Filter Genre</label>
+                    <select name="genre" id="genre" onchange="this.form.submit()" class="w-full border px-4 py-3 rounded text-lg">
+                        <option value="">Semua Genre</option>
                         @foreach ($genres as $genreItem)
-                @php
-                    $genreName = $genreItem['name'];
-                    $isActive = request('genre') == $genreName;
-                    $url = $isActive
-                        ? request()->fullUrlWithQuery(['genre' => null])
-                        : request()->fullUrlWithQuery(['genre' => $genreName]);
-                @endphp
-                <a href="{{ $url }}"
-                class="px-4 py-2 rounded-full border {{ $isActive ? 'bg-blue-500 text-white' : 'bg-white text-gray-700' }}">
-                    {{ $genreName }}
-                </a>
-            @endforeach
+                            <option value="{{ $genreItem['name'] }}" {{ request('genre') == $genreItem['name'] ? 'selected' : '' }}>
+                                {{ $genreItem['name'] }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
 
-                        <a href="{{ route('welcome') }}"
-                        class="px-4 py-2 rounded-full border bg-white text-gray-700">Reset</a>
-                    </div>
-
-                    <h2 class="text-2xl font-bold mb-2">Filter Cast</h2>
-                    <div class="flex gap-2 flex-wrap mb-8">
+                <div class="flex-[0.3]">
+                    <label for="cast" class="block text-xl font-semibold mb-1">Filter Cast</label>
+                    <select name="cast" id="cast" onchange="this.form.submit()" class="w-full border px-4 py-3 rounded text-lg">
+                        <option value="">Semua Cast</option>
                         @foreach ($casts as $castItem)
-                @php
-                    $castName = $castItem['name'];
-                    $isActive = request('cast') == $castName;
-                    $url = $isActive
-                        ? request()->fullUrlWithQuery(['cast' => null])
-                        : request()->fullUrlWithQuery(['cast' => $castName]);
-                @endphp
-                <a href="{{ $url }}"
-                class="px-4 py-2 rounded-full border {{ $isActive ? 'bg-green-500 text-white' : 'bg-white text-gray-700' }}">
-                    {{ $castName }}
-                </a>
-            @endforeach
+                            <option value="{{ $castItem['name'] }}" {{ request('cast') == $castItem['name'] ? 'selected' : '' }}>
+                                {{ $castItem['name'] }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
 
-        </div>
+            <div class="mt-4">
+                <a href="{{ route('welcome') }}" class="inline-block text-yellow-600 hover:underline">Reset Filter</a>
+            </div>
+        </form>
     </div>
+
 
     {{-- Film List --}}
     <div class="px-16 py-8">
@@ -75,7 +70,9 @@
                         <img class="w-full h-64 object-cover" src="{{ $poster }}" alt="{{ $movie['title'] }}" />
                         <div class="px-6 py-4">
                             <div class="font-bold text-xl mb-2">{{ $movie['title'] }}</div>
-                            <p class="text-gray-700 text-base">{{ $movie['genre'] ?? 'Tanpa genre' }}</p>
+                            @foreach ($movie['genres'] as $genre)
+                                <p class="text-gray-700 text-base">{{ $genre['name'] }}</p>
+                            @endforeach
                         </div>
                     </div>
                 </a>
