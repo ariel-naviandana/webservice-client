@@ -3,11 +3,26 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Session;
 
 class EditProfileController extends Controller
 {
+    public function show()
+    {
+        $userId = Session::get('user_id');
+        $token = Session::get('api_token');
+
+        $response = Http::withToken($token)->get("http://localhost:8000/api/users/{$userId}");
+
+        if ($response->successful()) {
+            $user = $response->json();
+            return view('editprofile', compact('user'));
+        }
+
+        return redirect()->route('welcome')->with('error', 'Gagal mengambil data profil.');
+    }
+
     public function edit(Request $request)
     {
         $request->validate([
@@ -17,6 +32,7 @@ class EditProfileController extends Controller
         ]);
 
         $userId = Session::get('user_id');
+        $token = Session::get('api_token');
         $data = [
             'name' => $request->name,
             'email' => $request->email,
@@ -26,29 +42,46 @@ class EditProfileController extends Controller
             try {
                 $cloudinaryUrl = 'https://api.cloudinary.com/v1_1/dto6d9tbe/image/upload';
                 $cloudinaryPreset = 'projek-tis';
+                $maxRetries = 3;
+                $retryDelay = 1000;
 
-                $response = Http::withOptions([
-                    'verify' => false,
-                ])->attach(
-                    'file',
-                    file_get_contents($request->file('photo')->getRealPath()),
-                    $request->file('photo')->getClientOriginalName()
-                )->post($cloudinaryUrl, [
-                    'upload_preset' => $cloudinaryPreset,
-                    'folder' => 'user_profiles',
-                ]);
+                $cloudinaryResponse = null;
+                for ($attempt = 1; $attempt <= $maxRetries; $attempt++) {
+                    try {
+                        $cloudinaryResponse = Http::withOptions([
+                            'verify' => false,
+                            'timeout' => 30,
+                            'connect_timeout' => 10,
+                        ])->attach(
+                            'file',
+                            file_get_contents($request->file('photo')->getRealPath()),
+                            $request->file('photo')->getClientOriginalName()
+                        )->post($cloudinaryUrl, [
+                            'upload_preset' => $cloudinaryPreset,
+                            'folder' => 'user_profiles',
+                        ]);
 
-                if ($response->successful()) {
-                    $data['image'] = $response->json()['secure_url'];
-                } else {
+                        if ($cloudinaryResponse->successful()) {
+                            $data['image'] = $cloudinaryResponse->json()['secure_url'];
+                            break;
+                        }
+                    } catch (\Exception $e) {
+                        if ($attempt === $maxRetries) {
+                            return redirect()->route('editprofile')->with('error', 'Gagal mengunggah gambar: ' . $e->getMessage());
+                        }
+                        sleep($retryDelay / 1000);
+                    }
+                }
+
+                if (!$cloudinaryResponse->successful()) {
                     return redirect()->route('editprofile')->with('error', 'Gagal mengunggah gambar ke Cloudinary.');
                 }
             } catch (\Exception $e) {
-                return redirect()->route('editprofile')->with('error', 'Gagal mengunggah gambar ke Cloudinary: ' . $e->getMessage());
+                return redirect()->route('editprofile')->with('error', 'Gagal mengunggah gambar: ' . $e->getMessage());
             }
         }
 
-        $response = Http::put("http://localhost:8000/api/users/{$userId}", $data);
+        $response = Http::withToken($token)->put("http://localhost:8000/api/users/{$userId}", $data);
 
         if ($response->successful()) {
             Session::put('user_name', $request->name);
@@ -57,9 +90,9 @@ class EditProfileController extends Controller
                 Session::put('user_photo', $data['image']);
             }
             return redirect()->route('editprofile')->with('success', 'Profil berhasil diperbarui.');
-        } else {
-            $error = $response->json('message') ?? 'Gagal memperbarui profil. Silakan coba lagi.';
-            return redirect()->route('editprofile')->with('error', $error);
         }
+
+        $error = $response->json('message') ?? 'Gagal memperbarui profil.';
+        return redirect()->route('editprofile')->with('error', $error);
     }
 }

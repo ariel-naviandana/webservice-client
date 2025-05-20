@@ -2,12 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Film;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Session;
 
 class HomeController extends Controller
 {
@@ -17,25 +14,24 @@ class HomeController extends Controller
     {
         $genreFilter = $request->input('genre');
         $castFilter = $request->input('cast');
+        $token = Session::get('api_token');
 
-        $response = Http::get("{$this->baseUrl}/films");
-        $responseCasts = Http::get("{$this->baseUrl}/casts");
-        $responseGenres = Http::get("{$this->baseUrl}/genres");
+        $response = Http::withToken($token)->get("{$this->baseUrl}/films");
+        $responseCasts = Http::withToken($token)->get("{$this->baseUrl}/casts");
+        $responseGenres = Http::withToken($token)->get("{$this->baseUrl}/genres");
 
         if (!$response->successful()) {
-            return redirect()->back()->with('error', 'Gagal mengambil data film');
+            return redirect()->route('welcome')->with('error', 'Gagal mengambil data film');
         }
 
-        $films = $response->json();
+        $films = collect($response->json());
 
-        // FILTER by genre
         if ($genreFilter) {
             $films = $films->filter(function ($film) use ($genreFilter) {
                 return collect($film['genres'])->pluck('name')->contains($genreFilter);
             });
         }
 
-        // FILTER by cast
         if ($castFilter) {
             $films = $films->filter(function ($film) use ($castFilter) {
                 return collect($film['characters'])->pluck('name')->contains($castFilter);
@@ -43,7 +39,7 @@ class HomeController extends Controller
         }
 
         return view('welcome', [
-            'films' => $films,
+            'films' => $films->values(),
             'genres' => $responseGenres->successful() ? $responseGenres->json() : [],
             'casts' => $responseCasts->successful() ? $responseCasts->json() : [],
         ]);
