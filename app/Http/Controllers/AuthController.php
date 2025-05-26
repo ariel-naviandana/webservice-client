@@ -42,7 +42,7 @@ class AuthController extends Controller
 
                 return redirect()->route('welcome');
             } else {
-                return redirect()->back()->with('message', 'Registrasi gagal dilakukan.');
+                return redirect()->back()->with('message', 'Login gagal dilakukan.');
             }
         } catch (\Exception $e) {
             return redirect()->route('login_form')->with('message', 'Terjadi kesalahan: ' . $e->getMessage());
@@ -56,16 +56,16 @@ class AuthController extends Controller
 
     public function registerProcess(Request $request)
     {
-        $response = Http::post("{$this->apiBaseUrl}/register}", [
+        $response = Http::post("{$this->apiBaseUrl}/register", [
             'name' => $request->name,
             'email' => $request->email,
             'password' => $request->password,
         ]);
 
-        if ($response->status() == 200) {
+        if ($response->status() === 200) {
             return redirect()->route('login_form')->with('message', 'Registrasi berhasil, silakan login.');
         } else {
-            $error = $response->json('message') ?? 'Registrasi gagal.';
+            $error = $response->json('message') ?? '';
             return redirect()->back()->with('message', 'Registrasi gagal: ' . $error);
         }
     }
