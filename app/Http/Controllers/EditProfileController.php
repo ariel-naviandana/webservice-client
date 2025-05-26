@@ -8,12 +8,19 @@ use Illuminate\Support\Facades\Session;
 
 class EditProfileController extends Controller
 {
+    private $apiBaseUrl;
+
+    public function __construct()
+    {
+        $this->apiBaseUrl = env('API_BASE_URL');
+    }
+
     public function show()
     {
         $userId = Session::get('user_id');
         $token = Session::get('api_token');
 
-        $response = Http::withToken($token)->get("http://localhost:8000/api/users/{$userId}");
+        $response = Http::withToken($token)->get("{$this->apiBaseUrl}/users/{$userId}");
 
         if ($response->successful()) {
             $user = $response->json();
@@ -81,7 +88,7 @@ class EditProfileController extends Controller
             }
         }
 
-        $response = Http::withToken($token)->put("http://localhost:8000/api/users/{$userId}", $data);
+        $response = Http::withToken($token)->put("{$this->apiBaseUrl}/users/{$userId}", $data);
 
         if ($response->successful()) {
             Session::put('user_name', $request->name);

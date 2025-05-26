@@ -8,8 +8,16 @@ use Illuminate\Support\Facades\Session;
 
 class FilmController extends Controller
 {
-    protected $filmsApiUrl = 'http://localhost:8000/api/films';
-    protected $reviewsApiUrl = 'http://localhost:8000/api/reviews';
+    private $apiBaseUrl;
+    private $filmsApiUrl;
+    private $reviewsApiUrl;
+
+    public function __construct()
+    {
+        $this->apiBaseUrl = env('API_BASE_URL');
+        $this->filmsApiUrl = "{$this->apiBaseUrl}/films";
+        $this->reviewsApiUrl = "{$this->apiBaseUrl}/reviews";
+    }
 
     public function index()
     {

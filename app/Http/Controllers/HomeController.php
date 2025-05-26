@@ -8,7 +8,12 @@ use Illuminate\Support\Facades\Session;
 
 class HomeController extends Controller
 {
-    protected $baseUrl = 'http://localhost:8000/api';
+    private $apiBaseUrl;
+
+    public function __construct()
+    {
+        $this->apiBaseUrl = env('API_BASE_URL');
+    }
 
     public function index(Request $request)
     {
@@ -16,9 +21,9 @@ class HomeController extends Controller
         $castFilter = $request->input('cast');
         $token = Session::get('api_token');
 
-        $response = Http::withToken($token)->get("{$this->baseUrl}/films");
-        $responseCasts = Http::withToken($token)->get("{$this->baseUrl}/casts");
-        $responseGenres = Http::withToken($token)->get("{$this->baseUrl}/genres");
+        $response = Http::withToken($token)->get("{$this->apiBaseUrl}/films");
+        $responseCasts = Http::withToken($token)->get("{$this->apiBaseUrl}/casts");
+        $responseGenres = Http::withToken($token)->get("{$this->apiBaseUrl}/genres");
 
         if (!$response->successful()) {
             return redirect()->route('welcome')->with('error', 'Gagal mengambil data film');

@@ -64,7 +64,7 @@
                 @endphp
 
                 <a href="{{ route('films.show', $movie['id']) }}" class="block hover:shadow-lg transition">
-                    <div class="rounded overflow-hidden shadow-lg bg-white">
+                    <div class="rounded overflow-hidden shadow-lg bg-white" style="height: 400px">
                         <img class="w-full h-64 object-cover" src="{{ $poster }}" alt="{{ $movie['title'] }}" />
                         <div class="px-6 py-4">
                             <div class="font-bold text-xl mb-2">{{ $movie['title'] }}</div>

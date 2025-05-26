@@ -8,16 +8,25 @@ use Illuminate\Support\Facades\Session;
 
 class ReviewController extends Controller
 {
-    protected $apiUrl = 'http://localhost:8000/api/reviews';
-    protected $filmsApiUrl = 'http://localhost:8000/api/films';
-    protected $usersApiUrl = 'http://localhost:8000/api/users';
+    private $apiBaseUrl;
+    private $reviewsApiUrl;
+    private $usersApiUrl;
+    private $filmsApiUrl;
+
+    public function __construct()
+    {
+        $this->apiBaseUrl = env('API_BASE_URL');
+        $this->reviewsApiUrl = "{$this->apiBaseUrl}/reviews";
+        $this->usersApiUrl = "{$this->apiBaseUrl}/users";
+        $this->filmsApiUrl = "{$this->apiBaseUrl}/films";
+    }
 
     public function index()
     {
         $userId = Session::get('user_id');
         $token = Session::get('api_token');
 
-        $response = Http::withToken($token)->get($this->apiUrl);
+        $response = Http::withToken($token)->get($this->reviewsApiUrl);
 
         if (!$response->successful()) {
             return redirect()->route('welcome')->with('error', 'Gagal mengambil data review');
@@ -57,7 +66,7 @@ class ReviewController extends Controller
         $user = $userResponse->json();
         $isCritic = isset($user['role']) && $user['role'] === 'critic';
 
-        $response = Http::withToken($token)->post($this->apiUrl, [
+        $response = Http::withToken($token)->post($this->reviewsApiUrl, [
             'user_id' => $userId,
             'film_id' => $validated['film_id'],
             'rating' => $validated['rating'],
@@ -78,7 +87,7 @@ class ReviewController extends Controller
         $token = Session::get('api_token');
         $userId = Session::get('user_id');
 
-        $response = Http::withToken($token)->get("{$this->apiUrl}/{$id}");
+        $response = Http::withToken($token)->get("{$this->reviewsApiUrl}/{$id}");
 
         if (!$response->successful()) {
             return redirect()->route('reviews.index')->with('error', 'Gagal mengambil data review');
@@ -105,7 +114,7 @@ class ReviewController extends Controller
         $token = Session::get('api_token');
 
         // Check ownership
-        $reviewResponse = Http::withToken($token)->get("{$this->apiUrl}/{$id}");
+        $reviewResponse = Http::withToken($token)->get("{$this->reviewsApiUrl}/{$id}");
         if (!$reviewResponse->successful() || $reviewResponse->json()['user_id'] != $userId) {
             return redirect()->route('reviews.index')->with('error', 'Anda tidak memiliki izin untuk mengedit review ini.');
         }
@@ -119,7 +128,7 @@ class ReviewController extends Controller
         $user = $userResponse->json();
         $isCritic = isset($user['role']) && $user['role'] === 'critic';
 
-        $response = Http::withToken($token)->put("{$this->apiUrl}/{$id}", [
+        $response = Http::withToken($token)->put("{$this->reviewsApiUrl}/{$id}", [
             'rating' => $validated['rating'],
             'comment' => $validated['comment'],
             'is_critic' => $isCritic,
@@ -139,12 +148,12 @@ class ReviewController extends Controller
         $userId = Session::get('user_id');
 
         // Check ownership
-        $reviewResponse = Http::withToken($token)->get("{$this->apiUrl}/{$id}");
+        $reviewResponse = Http::withToken($token)->get("{$this->reviewsApiUrl}/{$id}");
         if (!$reviewResponse->successful() || $reviewResponse->json()['user_id'] != $userId) {
             return redirect()->route('reviews.index')->with('error', 'Anda tidak memiliki izin untuk menghapus review ini.');
         }
 
-        $response = Http::withToken($token)->delete("{$this->apiUrl}/{$id}");
+        $response = Http::withToken($token)->delete("{$this->reviewsApiUrl}/{$id}");
 
         if ($response->successful()) {
             return redirect()->back()->with('success', 'Review berhasil dihapus.');
