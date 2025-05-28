@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Session;
@@ -72,7 +73,17 @@ class AuthController extends Controller
 
     public function logout()
     {
-        Session::flush();
-        return redirect()->route('login_form')->with('message', 'Berhasil logout.');
+        try {
+            $response = Http::withToken(Session::get('api_token'))->post("{$this->apiBaseUrl}/logout");
+        } catch (ConnectionException $e) {
+            return redirect()->route('welcome')->with('message', 'Gagal logout. Silakan coba lagi.');
+        }
+
+        if ($response->status() == 200) {
+            Session::flush();
+            return redirect()->route('login_form')->with('message', 'Berhasil logout.');
+        } else {
+            return redirect()->route('welcome')->with('message', 'Gagal logout. Silakan coba lagi.');
+        }
     }
 }
