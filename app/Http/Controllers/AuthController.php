@@ -29,12 +29,11 @@ class AuthController extends Controller
                 'password' => $request->password,
             ]);
 
-            if ($response->status() == 200) {
+            if ($response->successful()) {
                 $data = $response->json();
                 $user = $data['user'];
                 $token = $data['token'];
 
-                // Store user data and token in session
                 Session::put('user_id', $user['id']);
                 Session::put('user_name', $user['name']);
                 Session::put('user_email', $user['email']);
@@ -43,10 +42,13 @@ class AuthController extends Controller
 
                 return redirect()->route('welcome');
             } else {
-                return redirect()->back()->with('message', 'Login gagal dilakukan.');
+                $errorMsg = $response->json('message') ?? 'Login gagal dilakukan.';
+                return redirect()->back()->with('message', $errorMsg);
             }
+        } catch (ConnectionException $e) {
+            return redirect()->back()->with('message', 'Tidak dapat terhubung ke server API.');
         } catch (\Exception $e) {
-            return redirect()->route('login_form')->with('message', 'Terjadi kesalahan: ' . $e->getMessage());
+            return redirect()->back()->with('message', 'Terjadi kesalahan (internal). Silakan coba lagi.');
         }
     }
 
@@ -57,17 +59,27 @@ class AuthController extends Controller
 
     public function registerProcess(Request $request)
     {
-        $response = Http::post("{$this->apiBaseUrl}/register", [
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => $request->password,
-        ]);
+        try {
+            $response = Http::post("{$this->apiBaseUrl}/register", [
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => $request->password,
+            ]);
 
-        if ($response->status() === 200) {
-            return redirect()->route('login_form')->with('message', 'Registrasi berhasil, silakan login.');
-        } else {
-            $error = $response->json('message') ?? '';
-            return redirect()->back()->with('message', 'Registrasi gagal: ' . $error);
+            if ($response->successful()) {
+                return redirect()->route('login_form')->with('message', 'Registrasi berhasil, silakan login.');
+            } else {
+                // Tampilkan pesan error validasi jika ada
+                $error = $response->json('message') ?? 'Registrasi gagal.';
+                if ($response->json('errors')) {
+                    $error .= ' '.collect($response->json('errors'))->flatten()->join(' ');
+                }
+                return redirect()->back()->with('message', $error);
+            }
+        } catch (ConnectionException $e) {
+            return redirect()->back()->with('message', 'Tidak dapat terhubung ke server API.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('message', 'Terjadi kesalahan (internal). Silakan coba lagi.');
         }
     }
 
@@ -75,15 +87,16 @@ class AuthController extends Controller
     {
         try {
             $response = Http::withToken(Session::get('api_token'))->post("{$this->apiBaseUrl}/logout");
+            if ($response->successful()) {
+                Session::flush();
+                return redirect()->route('login_form')->with('message', 'Berhasil logout.');
+            } else {
+                return redirect()->route('welcome')->with('message', 'Gagal logout. Silakan coba lagi.');
+            }
         } catch (ConnectionException $e) {
-            return redirect()->route('welcome')->with('message', 'Gagal logout. Silakan coba lagi.');
-        }
-
-        if ($response->status() == 200) {
-            Session::flush();
-            return redirect()->route('login_form')->with('message', 'Berhasil logout.');
-        } else {
-            return redirect()->route('welcome')->with('message', 'Gagal logout. Silakan coba lagi.');
+            return redirect()->route('welcome')->with('message', 'Tidak dapat terhubung ke server API.');
+        } catch (\Exception $e) {
+            return redirect()->route('welcome')->with('message', 'Terjadi kesalahan (internal) saat logout.');
         }
     }
 }

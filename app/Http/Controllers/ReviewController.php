@@ -25,19 +25,20 @@ class ReviewController extends Controller
     {
         $userId = Session::get('user_id');
         $token = Session::get('api_token');
-
-        $response = Http::withToken($token)->get($this->reviewsApiUrl);
-
-        if (!$response->successful()) {
-            return redirect()->route('welcome')->with('error', 'Gagal mengambil data review');
+        try {
+            $response = Http::withToken($token)->get($this->reviewsApiUrl);
+            if (!$response->successful()) {
+                $error = $response->json('message') ?? 'Gagal mengambil data review';
+                return redirect()->route('welcome')->with('error', $error);
+            }
+            $allReviews = $response->json();
+            $userReviews = collect($allReviews)->filter(function ($review) use ($userId) {
+                return isset($review['user']['id']) && $review['user']['id'] == $userId;
+            })->values();
+            return view('reviews.index', ['reviews' => $userReviews]);
+        } catch (\Exception $e) {
+            return redirect()->route('welcome')->with('error', 'Terjadi kesalahan saat mengambil data review');
         }
-
-        $allReviews = $response->json();
-        $userReviews = collect($allReviews)->filter(function ($review) use ($userId) {
-            return isset($review['user']['id']) && $review['user']['id'] == $userId;
-        })->values();
-
-        return view('reviews.index', ['reviews' => $userReviews]);
     }
 
     public function create(Request $request)
@@ -56,50 +57,56 @@ class ReviewController extends Controller
 
         $userId = Session::get('user_id');
         $token = Session::get('api_token');
+        try {
+            $userResponse = Http::withToken($token)->get("{$this->usersApiUrl}/{$userId}");
+            if (!$userResponse->successful()) {
+                $error = $userResponse->json('message') ?? 'Gagal mengambil data pengguna.';
+                return back()->withErrors([$error]);
+            }
+            $user = $userResponse->json();
+            $isCritic = isset($user['role']) && $user['role'] === 'critic';
 
-        $userResponse = Http::withToken($token)->get("{$this->usersApiUrl}/{$userId}");
+            $response = Http::withToken($token)->post($this->reviewsApiUrl, [
+                'user_id' => $userId,
+                'film_id' => $validated['film_id'],
+                'rating' => $validated['rating'],
+                'comment' => $validated['comment'],
+                'is_critic' => $isCritic,
+            ]);
 
-        if (!$userResponse->successful()) {
-            return back()->withErrors(['Gagal mengambil data pengguna.']);
+            if ($response->successful()) {
+                return redirect()->route('films.show', ['id' => $validated['film_id']])
+                    ->with('success', 'Review berhasil disimpan.');
+            }
+
+            $error = $response->json('message') ?? 'Gagal menyimpan review.';
+            if ($response->json('errors')) {
+                $error .= ' '.collect($response->json('errors'))->flatten()->join(' ');
+            }
+            return back()->withErrors([$error]);
+        } catch (\Exception $e) {
+            return back()->withErrors(['Terjadi kesalahan saat menyimpan review.']);
         }
-
-        $user = $userResponse->json();
-        $isCritic = isset($user['role']) && $user['role'] === 'critic';
-
-        $response = Http::withToken($token)->post($this->reviewsApiUrl, [
-            'user_id' => $userId,
-            'film_id' => $validated['film_id'],
-            'rating' => $validated['rating'],
-            'comment' => $validated['comment'],
-            'is_critic' => $isCritic,
-        ]);
-
-        if ($response->successful()) {
-            return redirect()->route('films.show', ['id' => $validated['film_id']])
-                ->with('success', 'Review berhasil disimpan.');
-        }
-
-        return back()->withErrors(['Gagal menyimpan review.']);
     }
 
     public function edit($id)
     {
         $token = Session::get('api_token');
         $userId = Session::get('user_id');
-
-        $response = Http::withToken($token)->get("{$this->reviewsApiUrl}/{$id}");
-
-        if (!$response->successful()) {
-            return redirect()->route('reviews.index')->with('error', 'Gagal mengambil data review');
+        try {
+            $response = Http::withToken($token)->get("{$this->reviewsApiUrl}/{$id}");
+            if (!$response->successful()) {
+                $error = $response->json('message') ?? 'Gagal mengambil data review';
+                return redirect()->route('reviews.index')->with('error', $error);
+            }
+            $review = $response->json();
+            if ($review['user_id'] != $userId) {
+                return redirect()->route('reviews.index')->with('error', 'Anda tidak memiliki izin untuk mengedit review ini.');
+            }
+            return view('reviews.edit', ['review' => (object) $review]);
+        } catch (\Exception $e) {
+            return redirect()->route('reviews.index')->with('error', 'Terjadi kesalahan saat mengambil data review');
         }
-
-        $review = $response->json();
-
-        if ($review['user_id'] != $userId) {
-            return redirect()->route('reviews.index')->with('error', 'Anda tidak memiliki izin untuk mengedit review ini.');
-        }
-
-        return view('reviews.edit', ['review' => (object) $review]);
     }
 
     public function update(Request $request, $id)
@@ -112,53 +119,59 @@ class ReviewController extends Controller
 
         $userId = Session::get('user_id');
         $token = Session::get('api_token');
+        try {
+            $reviewResponse = Http::withToken($token)->get("{$this->reviewsApiUrl}/{$id}");
+            if (!$reviewResponse->successful() || $reviewResponse->json()['user_id'] != $userId) {
+                return redirect()->route('reviews.index')->with('error', 'Anda tidak memiliki izin untuk mengedit review ini.');
+            }
 
-        // Check ownership
-        $reviewResponse = Http::withToken($token)->get("{$this->reviewsApiUrl}/{$id}");
-        if (!$reviewResponse->successful() || $reviewResponse->json()['user_id'] != $userId) {
-            return redirect()->route('reviews.index')->with('error', 'Anda tidak memiliki izin untuk mengedit review ini.');
+            $userResponse = Http::withToken($token)->get("{$this->usersApiUrl}/{$userId}");
+            if (!$userResponse->successful()) {
+                $error = $userResponse->json('message') ?? 'Gagal mengambil data pengguna.';
+                return back()->withErrors([$error]);
+            }
+            $user = $userResponse->json();
+            $isCritic = isset($user['role']) && $user['role'] === 'critic';
+
+            $response = Http::withToken($token)->put("{$this->reviewsApiUrl}/{$id}", [
+                'rating' => $validated['rating'],
+                'comment' => $validated['comment'],
+                'is_critic' => $isCritic,
+            ]);
+
+            if ($response->successful()) {
+                return redirect()->route('films.show', ['id' => $validated['film_id']])
+                    ->with('success', 'Review berhasil diperbarui.');
+            }
+
+            $error = $response->json('message') ?? 'Gagal memperbarui review.';
+            if ($response->json('errors')) {
+                $error .= ' '.collect($response->json('errors'))->flatten()->join(' ');
+            }
+            return back()->withErrors([$error]);
+        } catch (\Exception $e) {
+            return back()->withErrors(['Terjadi kesalahan saat memperbarui review.']);
         }
-
-        $userResponse = Http::withToken($token)->get("{$this->usersApiUrl}/{$userId}");
-
-        if (!$userResponse->successful()) {
-            return back()->withErrors(['Gagal mengambil data pengguna.']);
-        }
-
-        $user = $userResponse->json();
-        $isCritic = isset($user['role']) && $user['role'] === 'critic';
-
-        $response = Http::withToken($token)->put("{$this->reviewsApiUrl}/{$id}", [
-            'rating' => $validated['rating'],
-            'comment' => $validated['comment'],
-            'is_critic' => $isCritic,
-        ]);
-
-        if ($response->successful()) {
-            return redirect()->route('films.show', ['id' => $validated['film_id']])
-                ->with('success', 'Review berhasil diperbarui.');
-        }
-
-        return back()->withErrors(['Gagal memperbarui review.']);
     }
 
     public function destroy($id)
     {
         $token = Session::get('api_token');
         $userId = Session::get('user_id');
+        try {
+            $reviewResponse = Http::withToken($token)->get("{$this->reviewsApiUrl}/{$id}");
+            if (!$reviewResponse->successful() || $reviewResponse->json()['user_id'] != $userId) {
+                return redirect()->route('reviews.index')->with('error', 'Anda tidak memiliki izin untuk menghapus review ini.');
+            }
 
-        // Check ownership
-        $reviewResponse = Http::withToken($token)->get("{$this->reviewsApiUrl}/{$id}");
-        if (!$reviewResponse->successful() || $reviewResponse->json()['user_id'] != $userId) {
-            return redirect()->route('reviews.index')->with('error', 'Anda tidak memiliki izin untuk menghapus review ini.');
+            $response = Http::withToken($token)->delete("{$this->reviewsApiUrl}/{$id}");
+            if ($response->successful()) {
+                return redirect()->back()->with('success', 'Review berhasil dihapus.');
+            }
+            $error = $response->json('message') ?? 'Gagal menghapus review.';
+            return redirect()->back()->with('error', $error);
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat menghapus review.');
         }
-
-        $response = Http::withToken($token)->delete("{$this->reviewsApiUrl}/{$id}");
-
-        if ($response->successful()) {
-            return redirect()->back()->with('success', 'Review berhasil dihapus.');
-        }
-
-        return redirect()->back()->with('error', 'Gagal menghapus review.');
     }
 }

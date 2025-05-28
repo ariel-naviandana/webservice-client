@@ -10,54 +10,59 @@ class FilmController extends Controller
 {
     private $apiBaseUrl;
     private $filmsApiUrl;
-    private $reviewsApiUrl;
 
     public function __construct()
     {
         $this->apiBaseUrl = env('API_BASE_URL');
         $this->filmsApiUrl = "{$this->apiBaseUrl}/films";
-        $this->reviewsApiUrl = "{$this->apiBaseUrl}/reviews";
     }
 
     public function index()
     {
         $token = Session::get('api_token');
-        $response = Http::withToken($token)->get($this->filmsApiUrl);
-
-        if ($response->successful()) {
-            $films = $response->json();
-            return view('films.index', compact('films'));
+        try {
+            $response = Http::withToken($token)->get($this->filmsApiUrl);
+            if ($response->successful()) {
+                $films = $response->json();
+                return view('films.index', compact('films'));
+            }
+            $error = $response->json('message') ?? 'Gagal mengambil data film';
+            return redirect()->route('welcome')->with('error', $error);
+        } catch (\Exception $e) {
+            return redirect()->route('welcome')->with('error', 'Terjadi kesalahan saat mengambil data film');
         }
-
-        return redirect()->route('welcome')->with('error', 'Gagal mengambil data film');
     }
 
     public function show($id)
     {
         $token = Session::get('api_token');
-        $response = Http::withToken($token)->get("{$this->filmsApiUrl}/{$id}");
+        try {
+            $response = Http::withToken($token)->get("{$this->filmsApiUrl}/{$id}");
+            if (!$response->successful()) {
+                $error = $response->json('message') ?? 'Gagal mengambil detail film';
+                return redirect()->route('films.index')->with('error', $error);
+            }
 
-        if (!$response->successful()) {
-            return redirect()->route('films.index')->with('error', 'Gagal mengambil detail film');
+            $film = $response->json();
+            $userId = Session::get('user_id');
+
+            $userReview = null;
+            if ($userId) {
+                $userReview = collect($film['reviews'])->firstWhere('user_id', $userId);
+            }
+
+            $ratings = array_column($film['reviews'], 'rating');
+            $rating_avg = count($ratings) ? round(array_sum($ratings) / count($ratings), 1) : 0;
+            $total_reviews = count($film['reviews']);
+
+            return view('films.show', [
+                'film' => $film,
+                'userReview' => $userReview,
+                'rating_avg' => $rating_avg,
+                'total_reviews' => $total_reviews,
+            ]);
+        } catch (\Exception $e) {
+            return redirect()->route('films.index')->with('error', 'Terjadi kesalahan saat mengambil detail film');
         }
-
-        $film = $response->json();
-        $userId = Session::get('user_id');
-
-        $userReview = null;
-        if ($userId) {
-            $userReview = collect($film['reviews'])->firstWhere('user_id', $userId);
-        }
-
-        $ratings = array_column($film['reviews'], 'rating');
-        $rating_avg = count($ratings) ? round(array_sum($ratings) / count($ratings), 1) : 0;
-        $total_reviews = count($film['reviews']);
-
-        return view('films.show', [
-            'film' => $film,
-            'userReview' => $userReview,
-            'rating_avg' => $rating_avg,
-            'total_reviews' => $total_reviews,
-        ]);
     }
 }

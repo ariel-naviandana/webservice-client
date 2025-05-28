@@ -20,33 +20,37 @@ class HomeController extends Controller
         $genreFilter = $request->input('genre');
         $castFilter = $request->input('cast');
         $token = Session::get('api_token');
+        try {
+            $response = Http::withToken($token)->get("{$this->apiBaseUrl}/films");
+            $responseCasts = Http::withToken($token)->get("{$this->apiBaseUrl}/casts");
+            $responseGenres = Http::withToken($token)->get("{$this->apiBaseUrl}/genres");
 
-        $response = Http::withToken($token)->get("{$this->apiBaseUrl}/films");
-        $responseCasts = Http::withToken($token)->get("{$this->apiBaseUrl}/casts");
-        $responseGenres = Http::withToken($token)->get("{$this->apiBaseUrl}/genres");
+            if (!$response->successful()) {
+                $error = $response->json('message') ?? 'Gagal mengambil data film';
+                return redirect()->route('welcome')->with('error', $error);
+            }
 
-        if (!$response->successful()) {
-            return redirect()->route('welcome')->with('error', 'Gagal mengambil data film');
+            $films = collect($response->json());
+
+            if ($genreFilter) {
+                $films = $films->filter(function ($film) use ($genreFilter) {
+                    return collect($film['genres'])->pluck('name')->contains($genreFilter);
+                });
+            }
+
+            if ($castFilter) {
+                $films = $films->filter(function ($film) use ($castFilter) {
+                    return collect($film['characters'])->pluck('name')->contains($castFilter);
+                });
+            }
+
+            return view('welcome', [
+                'films' => $films->values(),
+                'genres' => $responseGenres->successful() ? $responseGenres->json() : [],
+                'casts' => $responseCasts->successful() ? $responseCasts->json() : [],
+            ]);
+        } catch (\Exception $e) {
+            return redirect()->route('welcome')->with('error', 'Terjadi kesalahan saat mengambil data film');
         }
-
-        $films = collect($response->json());
-
-        if ($genreFilter) {
-            $films = $films->filter(function ($film) use ($genreFilter) {
-                return collect($film['genres'])->pluck('name')->contains($genreFilter);
-            });
-        }
-
-        if ($castFilter) {
-            $films = $films->filter(function ($film) use ($castFilter) {
-                return collect($film['characters'])->pluck('name')->contains($castFilter);
-            });
-        }
-
-        return view('welcome', [
-            'films' => $films->values(),
-            'genres' => $responseGenres->successful() ? $responseGenres->json() : [],
-            'casts' => $responseCasts->successful() ? $responseCasts->json() : [],
-        ]);
     }
 }
