@@ -9,10 +9,8 @@ use App\Http\Controllers\HomeController;
 use App\Http\Middleware\CheckAuth;
 
 // Public Routes
-Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login_form');
 Route::post('/login_process', [AuthController::class, 'loginProcess'])->name('login_process');
 
-Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register_form');
 Route::post('/register_process', [AuthController::class, 'registerProcess'])->name('register_process');
 
 Route::get('/', [HomeController::class, 'index'])->name('welcome');
@@ -21,6 +19,9 @@ Route::get('/films/{id}', [FilmController::class, 'show'])->name('films.show');
 
 // Protected Routes
 Route::middleware(CheckAuth::class)->group(function () {
+    Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login_form');
+    Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register_form');
+
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
     Route::get('/edit-profile', [EditProfileController::class, 'show'])->name('editprofile');

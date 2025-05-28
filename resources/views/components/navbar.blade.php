@@ -21,8 +21,8 @@
             </div>
         @else
             {{-- Jika user belum login, arahkan ke halaman login --}}
-            <a href="{{ route('login_form') }}" class="bg-green-400 px-4 py-2 hover:bg-green-500 text-black">
-                Akun
+            <a href="{{ route('login_form') }}" class="bg-blue-400 px-4 py-2 hover:bg-blue-500 text-white">
+                Login
             </a>
         @endif
     </div>
