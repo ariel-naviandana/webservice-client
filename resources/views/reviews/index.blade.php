@@ -9,8 +9,23 @@
 <div class="container">
     <h2>Daftar Review Film</h2>
 
-    @if (session('success'))
+    @if(session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
+    @if(session('error'))
+        <div class="alert alert-danger">{{ session('error') }}</div>
+    @endif
+    @if(session('message'))
+        <div class="alert alert-info">{{ session('message') }}</div>
+    @endif
+    @if($errors->any())
+        <div class="alert alert-danger">
+            <ul class="mb-0">
+                @foreach($errors->all() as $err)
+                    <li>{{ $err }}</li>
+                @endforeach
+            </ul>
+        </div>
     @endif
 
     <a href="{{ route('dashboard') }}" class="btn-detail">« Kembali ke Dashboard</a>
@@ -23,7 +38,6 @@
                 <p class="gallery-info">Rating: {{ $review['rating'] }}</p>
                 <p class="gallery-info">Komentar: {{ $review['comment'] }}</p>
                 <p class="gallery-info">Reviewer: {{ $review['user']['name'] ?? '-' }}</p>
-
                 <div class="btn-group">
                     <a href="{{ route('reviews.edit', $review['id']) }}" class="btn-edit">Edit</a>
                     <form action="{{ route('reviews.destroy', $review['id']) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus?')">

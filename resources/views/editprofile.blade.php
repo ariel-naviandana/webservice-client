@@ -15,14 +15,8 @@
             border: 4px solid #ccc;
             transition: border-color 0.3s;
         }
-
-        .profile-pic:hover {
-            border-color: #f5c518;
-        }
-
-        input[type="file"] {
-            display: none;
-        }
+        .profile-pic:hover { border-color: #f5c518; }
+        input[type="file"] { display: none; }
     </style>
 </head>
 <body>
@@ -36,10 +30,23 @@
             {{ session('success') }}
         </div>
     @endif
-
     @if (session('error'))
         <div class="bg-red-100 text-red-700 px-4 py-3 rounded mb-6 w-full max-w-lg">
             {{ session('error') }}
+        </div>
+    @endif
+    @if (session('message'))
+        <div class="bg-blue-100 text-blue-700 px-4 py-3 rounded mb-6 w-full max-w-lg">
+            {{ session('message') }}
+        </div>
+    @endif
+    @if ($errors->any())
+        <div class="bg-red-100 text-red-700 px-4 py-3 rounded mb-6 w-full max-w-lg">
+            <ul class="mb-0">
+                @foreach($errors->all() as $err)
+                    <li>{{ $err }}</li>
+                @endforeach
+            </ul>
         </div>
     @endif
 
@@ -83,17 +90,14 @@
         </div>
     </form>
 </div>
-
 <script>
     function previewImage(event) {
         const input = event.target;
         const reader = new FileReader();
-
         reader.onload = function () {
             const preview = document.getElementById('preview');
             preview.src = reader.result;
         }
-
         if (input.files[0]) {
             reader.readAsDataURL(input.files[0]);
         }
