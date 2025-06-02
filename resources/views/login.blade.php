@@ -3,6 +3,7 @@
 <head>
     <title>Login FilmKu</title>
     <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body class="login-page">
 <div class="containerlogin">

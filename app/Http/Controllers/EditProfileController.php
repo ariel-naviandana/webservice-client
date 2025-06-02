@@ -70,7 +70,7 @@ class EditProfileController extends Controller
                             'folder' => 'user_profiles',
                         ]);
                         if ($cloudinaryResponse->successful()) {
-                            $data['image'] = $cloudinaryResponse->json()['secure_url'];
+                            $data['photo_url'] = $cloudinaryResponse->json()['secure_url'];
                             break;
                         }
                     } catch (\Exception $e) {
@@ -94,7 +94,7 @@ class EditProfileController extends Controller
                 Session::put('user_name', $request->name);
                 Session::put('user_email', $request->email);
                 if (isset($data['image'])) {
-                    Session::put('user_photo', $data['image']);
+                    Session::put('user_photo', $data['photo_url']);
                 }
                 return redirect()->route('editprofile')->with('success', 'Profil berhasil diperbarui.');
             }

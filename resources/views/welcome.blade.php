@@ -7,29 +7,11 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>FilmKu</title>
     @vite(['resources/css/app.css'])
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
 <body>
 <x-navbar />
-
-@if(session('success'))
-    <div class="alert alert-success mx-16 mt-4">{{ session('success') }}</div>
-@endif
-@if(session('error'))
-    <div class="alert alert-danger mx-16 mt-4">{{ session('error') }}</div>
-@endif
-@if(session('message'))
-    <div class="alert alert-info mx-16 mt-4">{{ session('message') }}</div>
-@endif
-@if($errors->any())
-    <div class="alert alert-danger mx-16 mt-4">
-        <ul class="mb-0">
-            @foreach($errors->all() as $err)
-                <li>{{ $err }}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif
 
 <div class="px-16 py-8 mt-16">
     <h1 class="text-4xl font-bold">
@@ -37,6 +19,16 @@
     </h1>
     <p class="mt-4 text-lg">Temukan film favoritmu di sini!</p>
 </div>
+
+@if(session('success'))
+    <div class="alert alert-success mx-16">{{ session('success') }}</div>
+@endif
+@if(session('error'))
+    <div class="alert alert-danger mx-16">{{ session('error') }}</div>
+@endif
+@if(session('message'))
+    <div class="alert alert-info mx-16">{{ session('message') }}</div>
+@endif
 
 {{-- Filter Section Dropdown --}}
 <div class="px-16 mb-8">
